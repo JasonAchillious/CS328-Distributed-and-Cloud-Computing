@@ -1,21 +1,25 @@
 package server;
+import java.rmi.Remote;
+import java.rmi.RemoteException;
 
-public interface IFileServer {
-    public String read(String fileName);
+public interface IFileServer extends Remote{
 
-    public void create(String fileName);
+    public String read(String fileName) throws RemoteException;
 
-    public void edit(String fileName, String newContent);
+    public void create(String fileName) throws Exception;
 
-    public void delete(String fileName);
+    public void edit(String fileName, String newContent) throws RemoteException;
 
-    public void copy(String sourceFileName, String destinationFileName);
+    public void delete(String fileName) throws RemoteException;
 
-    public void move(String sourceFileName, String destinationFileName);
+    public void copy(String sourceFileName, String destinationFileName) throws RemoteException;
 
-    public int size(String fileName);
+    public void move(String sourceFileName, String destinationFileName) throws RemoteException;
 
-    public long lastModified(String fileName);
+    public long size(String fileName) throws RemoteException;
 
-    public long lastAccessed(String fileName);
+    public long lastModified(String fileName) throws RemoteException;
+
+    public long lastAccessed(String fileName) throws RemoteException;
+
 }
