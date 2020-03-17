@@ -12,8 +12,9 @@ public class ServerController {
             FileServerImpl robj = new FileServerImpl();
             IFileServer stub = (IFileServer) UnicastRemoteObject.exportObject(robj, 0);
 
-            Registry registry = LocateRegistry.getRegistry();
-            registry.bind("FileServer", stub);
+
+            Registry registry = LocateRegistry.createRegistry(1099);
+            registry.rebind("FileServer", stub);
             System.out.println("File Server is ready to listen...");
 
         } catch (Exception e) {
