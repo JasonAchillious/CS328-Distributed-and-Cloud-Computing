@@ -14,6 +14,8 @@ public class ClientController {
         Scanner in = new Scanner(System.in);
         String[] commandList = {"read", "create", "edit", "delete", "copy", "move", "printFileInfo"};
         Method[] methods = client.getClass().getMethods();
+
+        //user can keep to input method in loop.
         while (true){
             System.out.println("\nCommand list:");
             for (String comm: commandList){
@@ -24,8 +26,9 @@ public class ClientController {
             String commandLine = in.nextLine();
             String [] commArr = commandLine.split("\\s+");
 
+            // lead to no such method when input "   ". Without this, it may occurs error.
             if (commArr.length == 0){
-                commArr = new String[]{"noInvoke", "aa"};
+                commArr = new String[]{"noInvoke"};
             }
 
             if (commArr[0].equals("quit")){
@@ -35,10 +38,12 @@ public class ClientController {
 
             boolean findCorMethod = false;
             for (Method m: methods){
+                // Find method
                 if (m.getName().equals(commArr[0])){
                     findCorMethod = true;
                     int numOfArg = m.getParameterCount();
                     try {
+                        // invoke method by reflection.
                         String[] arguments = Arrays.copyOfRange(commArr, 1, numOfArg + 1);
                         m.invoke(client, arguments);
                     }catch (Exception e){
