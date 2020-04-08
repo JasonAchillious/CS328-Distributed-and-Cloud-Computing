@@ -1,52 +1,34 @@
 package myrmi.protocal;
 
 
+import java.io.Serializable;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 
-public class Protocal666 {
-    private String className;
-    private String methodName;
-    private Method[] methods;
+public class Protocal666 implements Serializable {
+    private static final long serialVersionUID = 1L;
     private Object[] args;
     private int objectKey;
     private Object result;
     private Method method;
+    private int status;
+    private Type returnType;
+    private Exception exception=null;
 
-    public Protocal666(Object object, String methodName){
-        this.className = object.getClass().getName();
-        this.objectKey = object.hashCode();
-        this.methods = object.getClass().getDeclaredMethods();
-        this.methodName = methodName;
+    public Protocal666(int status){
+        this.status = status;
     }
 
-    public Protocal666(Method method, Object[] args){
+    public Protocal666(Method method, Object[] args, int objectKey){
+        this(method, args);
+        this.objectKey = objectKey;
+    }
+
+    public Protocal666(Method method, Object[] args ){
         this.method = method;
         this.args = args;
     }
 
-    public String getClassName() {
-        return className;
-    }
-
-    public void setClassName(String className) {
-        this.className = className;
-    }
-
-    public String getMethodName() {
-        return methodName;
-    }
-
-    public void setMethodName(String methodName) {
-        this.methodName = methodName;
-    }
-
-    public Method[] getMethods() {
-        return methods;
-    }
-
-    public void setMethods(Method[] methods) {
-        this.methods = methods;
-    }
 
     public int getObjectKey() {
         return objectKey;
@@ -78,5 +60,29 @@ public class Protocal666 {
 
     public void setMethod(Method method) {
         this.method = method;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    public Type getReturnType() {
+        return returnType;
+    }
+
+    public void setReturnType(Type returnType) {
+        this.returnType = returnType;
+    }
+
+    public Exception getException() {
+        return exception;
+    }
+
+    public void setException(Exception exception) {
+        this.exception = exception;
     }
 }

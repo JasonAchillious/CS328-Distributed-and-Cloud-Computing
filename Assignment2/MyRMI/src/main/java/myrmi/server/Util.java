@@ -6,22 +6,16 @@ import myrmi.Remote;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
 
+
 public class Util {
 
-    public static Remote createStub(RemoteObjectRef ref) {
+    public static Remote createStub(Remote obj, RemoteObjectRef ref) {
         //TODO: finish
-        Class itfClass;
-        try {
-            String interfaceName = ref.getInterfaceName();
-            itfClass = Class.forName(interfaceName);
-        }catch (ClassNotFoundException e){
-            e.printStackTrace();
-            itfClass = Remote.class;
-        }
+        Class objClass = obj.getClass();
+        Class[] itfs = objClass.getInterfaces();
 
         StubInvocationHandler handler = new StubInvocationHandler(ref);
-        Class<?>[] interfaces = new Class[]{itfClass};
-        return (Remote) Proxy.newProxyInstance(itfClass.getClassLoader(), interfaces, handler);
+        return (Remote) Proxy.newProxyInstance(objClass.getClassLoader(), itfs, handler);
 
     }
 

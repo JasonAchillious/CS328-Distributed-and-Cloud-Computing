@@ -1,6 +1,7 @@
 package myrmi.server;
 
 import myrmi.exception.RemoteException;
+import myrmi.protocal.Protocal666;
 
 
 import java.io.IOException;
@@ -37,10 +38,31 @@ public class StubInvocationHandler implements InvocationHandler, Serializable {
          * 2. get result back and return to caller transparently
          * */
         //InetAddress address = InetAddress.getByName(host);
-        Socket client = new Socket(host, port);
+        Object result = null;
+        Socket client = new Socket(this.host, this.port);
+        Protocal666 prototcal = new Protocal666(method, args, this.objectKey);
+        ObjectOutputStream ops = new ObjectOutputStream(client.getOutputStream());
+        ops.writeObject(prototcal);
+        ops.close();
 
-        Object result = method.invoke(proxy, args);
-
+        ObjectInputStream ois = new ObjectInputStream(client.getInputStream());
+        Object returnObj = ois.readObject();
+        if (returnObj instanceof Protocal666){
+            Protocal666 invokedResult = (Protocal666) returnObj;
+            if (invokedResult.getException() != null){
+                if (invokedResult.getStatus() == -1){
+                    System.out.println("Invocation Error");
+                }
+                throw invokedResult.getException();
+            }else {
+                if (invokedResult.getStatus() == 2){
+                    result = invokedResult.getResult();
+                }else if (invokedResult.getStatus() == 1){
+                    System.out.println("Successfully invoked");
+                }
+            }
+        }
+        ois.close();
         return result;
     }
 

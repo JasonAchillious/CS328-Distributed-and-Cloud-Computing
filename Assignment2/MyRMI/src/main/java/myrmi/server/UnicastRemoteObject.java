@@ -39,6 +39,6 @@ public class UnicastRemoteObject implements Remote, java.io.Serializable {
 
         skeleton.start();
 
-        return Util.createStub(objRef);
+        return Util.createStub(obj, objRef);
     }
 }

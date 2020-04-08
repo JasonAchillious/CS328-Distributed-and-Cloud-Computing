@@ -32,37 +32,56 @@ public class SkeletonReqHandler extends Thread {
          * 1 void method, 2 non-void method
          *
          *  */
+        Object stub = null;
+        Object result = null;
+
+        Protocal666 invocationResult = new Protocal666(this.objectKey);
         try {
             ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
-            Protocal666 stub = (Protocal666) ois.readObject();
+            stub = ois.readObject();
             ois.close();
+        }catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+            invocationResult.setException(e);
+        }
 
-            int objectKey = stub.getObjectKey();
-            String methodName = stub.getMethodName();
-            Method[] objMethods = stub.getMethods();
-            Method methodInvoked = null;
-            for (Method m: objMethods){
-                if (m.getName().equals(methodName)){
-                    methodInvoked = m;
+        if (stub != null && stub instanceof Protocal666) {
+            int objectKey = ((Protocal666) stub).getObjectKey();
+            Method method = ((Protocal666) stub).getMethod();
+            Object[] args = ((Protocal666) stub).getArgs();
+            invocationResult.setObjectKey(objectKey);
+            invocationResult.setReturnType(method.getReturnType());
+
+            try {
+                if (objectKey == this.objectKey) {
+                    result = method.invoke(obj, args);
+                    if (result == null) {
+                        invocationResult.setStatus(1);
+                    }else {
+                        invocationResult.setStatus(2);
+                    }
+                }else {
+                    invocationResult.setException(new Exception("Wrong object key"));
+                    invocationResult.setStatus(-1);
                 }
+            }catch (Exception e) {
+                e.printStackTrace();
+                invocationResult.setStatus(-1);
+                invocationResult.setException(e);
             }
-            Class<?>[] argTypes = methodInvoked.getParameterTypes();
-            Object[] args = stub.getMethods();
+        }else {
+            invocationResult.setException( new Exception("Stub is null or is not instance of the protocal."));
+        }
 
-            Class objClass = obj.getClass();
-            Method objMethod = objClass.getDeclaredMethod(methodName, argTypes);
-            Object result = objMethod.invoke(obj, args);
-
+        try {
             ObjectOutputStream ops = new ObjectOutputStream(socket.getOutputStream());
-            stub.setResult(result);
-            ops.writeObject(stub);
+            invocationResult.setResult(result);
+            if (invocationResult.getStatus() != -1 && invocationResult.getException() != null){
+                invocationResult.setStatus(0);
+            }
+            ops.writeObject(invocationResult);
             ops.close();
-
-        }catch (IOException |
-                ClassNotFoundException |
-                NoSuchMethodException |
-                IllegalAccessException |
-                InvocationTargetException e){
+        }catch (IOException e){
             e.printStackTrace();
         }
     }

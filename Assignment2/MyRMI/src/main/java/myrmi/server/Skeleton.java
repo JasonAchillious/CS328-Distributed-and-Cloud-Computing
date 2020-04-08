@@ -44,6 +44,7 @@ public class Skeleton extends Thread {
 
         try {
             InetAddress address = InetAddress.getByName(host);
+
             ServerSocket serverSocket = new ServerSocket(port , BACKLOG, address);
             serverSocket.setSoTimeout(10000);
 

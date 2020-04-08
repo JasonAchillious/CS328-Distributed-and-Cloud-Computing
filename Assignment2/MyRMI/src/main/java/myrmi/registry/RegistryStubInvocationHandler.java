@@ -3,8 +3,7 @@ package myrmi.registry;
 import myrmi.exception.AlreadyBoundException;
 import myrmi.exception.NotBoundException;
 import myrmi.exception.RemoteException;
-import myrmi.server.RemoteObjectRef;
-import myrmi.server.Util;
+import myrmi.server.*;
 
 
 import java.lang.reflect.InvocationHandler;
@@ -16,9 +15,11 @@ public class RegistryStubInvocationHandler implements InvocationHandler {
     private RemoteObjectRef registryRef;
     private Registry registryStub;
 
-    public RegistryStubInvocationHandler(String host, int port) {
+    public RegistryStubInvocationHandler(String host, int port) throws RemoteException {
         this.registryRef = new RemoteObjectRef(host, port, 0, "myrmi.registry.Registry");
-        registryStub = (Registry) Util.createStub(this.registryRef);
+
+        Registry registry = new RegistryImpl(port);
+        registryStub = (Registry) Util.createStub(registry, this.registryRef);
     }
 
 
