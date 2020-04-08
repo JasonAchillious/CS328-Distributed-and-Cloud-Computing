@@ -11,6 +11,8 @@ import java.net.InetAddress;
 import java.util.*;
 
 public class RegistryImpl implements Registry {
+    //private String host;
+
     private final HashMap<String, Remote> bindings = new HashMap<>();
 
     /**
@@ -59,7 +61,7 @@ public class RegistryImpl implements Registry {
         System.out.printf("RegistryImpl: rebind(%s)\n", name);
 
         //TODO: implement method here
-        bindings.replace(name, obj);
+        bindings.put(name, obj);
     }
 
     public String[] list() throws RemoteException {

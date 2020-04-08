@@ -16,10 +16,11 @@ public class RegistryStubInvocationHandler implements InvocationHandler {
     private Registry registryStub;
 
     public RegistryStubInvocationHandler(String host, int port) throws RemoteException {
-        this.registryRef = new RemoteObjectRef(host, port, 0, "myrmi.registry.Registry");
-
-        Registry registry = new RegistryImpl(port);
-        registryStub = (Registry) Util.createStub(registry, this.registryRef);
+        this.registryRef = new RemoteObjectRef(host, port,
+                0,
+                "myrmi.registry.Registry"
+        );
+        registryStub = (Registry) Util.createStub(this.registryRef);
     }
 
 

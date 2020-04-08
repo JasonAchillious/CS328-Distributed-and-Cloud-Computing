@@ -1,7 +1,8 @@
 package myrmi.server;
 
 import myrmi.exception.RemoteException;
-import myrmi.protocal.Protocal666;
+import myrmi.protocal.InfoFromSkeleton;
+import myrmi.protocal.InfoFromStub;
 
 
 import java.io.IOException;
@@ -11,7 +12,6 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.Socket;
 
 public class StubInvocationHandler implements InvocationHandler, Serializable {
@@ -37,23 +37,36 @@ public class StubInvocationHandler implements InvocationHandler, Serializable {
          * 1. connect to remote skeleton, send method and arguments
          * 2. get result back and return to caller transparently
          * */
-        //InetAddress address = InetAddress.getByName(host);
+        InetAddress address = InetAddress.getByName(host);
         Object result = null;
-        Socket client = new Socket(this.host, this.port);
-        Protocal666 prototcal = new Protocal666(method, args, this.objectKey);
+        Socket client = new Socket(address, this.port);
+        /*
+        Serializable[] arguments;
+        try {
+            arguments = (Serializable[]) args;
+        }catch (Exception e){
+            arguments=null;
+            e.printStackTrace();
+        }
+        */
+        InfoFromStub infoStub = new InfoFromStub(method.getName(), args, this.objectKey);
         ObjectOutputStream ops = new ObjectOutputStream(client.getOutputStream());
-        ops.writeObject(prototcal);
-        ops.close();
+        ops.writeObject(infoStub);
+
 
         ObjectInputStream ois = new ObjectInputStream(client.getInputStream());
         Object returnObj = ois.readObject();
-        if (returnObj instanceof Protocal666){
-            Protocal666 invokedResult = (Protocal666) returnObj;
+        if (returnObj instanceof InfoFromSkeleton){
+
+            InfoFromSkeleton invokedResult = (InfoFromSkeleton) returnObj;
+
+            if (invokedResult.getObjectKey() != this.objectKey) throw new Exception("Wrong objectKey");
+
             if (invokedResult.getException() != null){
                 if (invokedResult.getStatus() == -1){
                     System.out.println("Invocation Error");
                 }
-                throw invokedResult.getException();
+                throw new Exception(invokedResult.getException());
             }else {
                 if (invokedResult.getStatus() == 2){
                     result = invokedResult.getResult();
@@ -62,7 +75,7 @@ public class StubInvocationHandler implements InvocationHandler, Serializable {
                 }
             }
         }
-        ois.close();
+        client.close();
         return result;
     }
 

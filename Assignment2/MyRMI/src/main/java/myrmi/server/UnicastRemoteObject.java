@@ -34,11 +34,18 @@ public class UnicastRemoteObject implements Remote, java.io.Serializable {
         //TODO: finish here
 
         int objectKey = obj.hashCode();
-        RemoteObjectRef objRef = new RemoteObjectRef(host, port, objectKey, "myrmi.server.Remote");
+
+        String Ifname= "Remote";
+        Class[] objInterfaces = obj.getClass().getInterfaces();
+        if (objInterfaces.length > 0){
+            Ifname = objInterfaces[0].getName();
+        }
+        RemoteObjectRef objRef = new RemoteObjectRef(host, port, objectKey,
+                Ifname);
         Skeleton skeleton = new Skeleton(obj, objRef);
 
         skeleton.start();
 
-        return Util.createStub(obj, objRef);
+        return Util.createStub(objRef);
     }
 }

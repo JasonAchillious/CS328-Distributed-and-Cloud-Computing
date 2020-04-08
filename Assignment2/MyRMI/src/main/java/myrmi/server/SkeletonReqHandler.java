@@ -1,13 +1,14 @@
 package myrmi.server;
 
 import myrmi.Remote;
-import myrmi.protocal.Protocal666;
+import myrmi.protocal.InfoFromSkeleton;
+import myrmi.protocal.InfoFromStub;
 
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.lang.reflect.InvocationTargetException;
+import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.net.Socket;
 
@@ -35,54 +36,71 @@ public class SkeletonReqHandler extends Thread {
         Object stub = null;
         Object result = null;
 
-        Protocal666 invocationResult = new Protocal666(this.objectKey);
+        InfoFromSkeleton invocationResult = new InfoFromSkeleton(this.objectKey);
         try {
             ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
             stub = ois.readObject();
-            ois.close();
+            //ois.close();
         }catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
-            invocationResult.setException(e);
+            invocationResult.setException(e.getMessage());
         }
 
-        if (stub != null && stub instanceof Protocal666) {
-            int objectKey = ((Protocal666) stub).getObjectKey();
-            Method method = ((Protocal666) stub).getMethod();
-            Object[] args = ((Protocal666) stub).getArgs();
-            invocationResult.setObjectKey(objectKey);
-            invocationResult.setReturnType(method.getReturnType());
+        if (stub != null && stub instanceof InfoFromStub) {
+            int objectKey = ((InfoFromStub) stub).getObjectKey();
+            String method = ((InfoFromStub) stub).getMethod();
+            Object[] args = ((InfoFromStub) stub).getArgs();
+
 
             try {
                 if (objectKey == this.objectKey) {
-                    result = method.invoke(obj, args);
-                    if (result == null) {
+                    boolean flag = false;
+                    for (Method m : this.obj.getClass().getDeclaredMethods()) {
+                        if (m.getName().equals(method)) {
+                            result = m.invoke(obj, args);
+                            invocationResult.setResult(result);
+                            flag = true;
+                        }
+                    }
+                    if (flag && result == null) {
                         invocationResult.setStatus(1);
-                    }else {
+                    }else if (flag){
                         invocationResult.setStatus(2);
                     }
                 }else {
-                    invocationResult.setException(new Exception("Wrong object key"));
+                    invocationResult.setException("Wrong object key");
                     invocationResult.setStatus(-1);
                 }
             }catch (Exception e) {
                 e.printStackTrace();
                 invocationResult.setStatus(-1);
-                invocationResult.setException(e);
+                invocationResult.setException(e.getMessage());
             }
         }else {
-            invocationResult.setException( new Exception("Stub is null or is not instance of the protocal."));
+            invocationResult.setException("Stub is null or is not instance of the protocal.");
         }
 
         try {
             ObjectOutputStream ops = new ObjectOutputStream(socket.getOutputStream());
-            invocationResult.setResult(result);
+            /*
+            if (result instanceof Serializable) {
+                invocationResult.setResult((Serializable) result);
+            }else {
+                invocationResult.setException("The result is not serializable");
+                invocationResult.setStatus(0);
+            }
+            */
+
             if (invocationResult.getStatus() != -1 && invocationResult.getException() != null){
                 invocationResult.setStatus(0);
             }
+
             ops.writeObject(invocationResult);
-            ops.close();
+            //ops.close();
+            this.socket.close();
         }catch (IOException e){
             e.printStackTrace();
         }
+
     }
 }

@@ -9,10 +9,20 @@ import java.lang.reflect.Proxy;
 
 public class Util {
 
-    public static Remote createStub(Remote obj, RemoteObjectRef ref) {
+    public static Remote createStub(RemoteObjectRef ref) {
         //TODO: finish
-        Class objClass = obj.getClass();
-        Class[] itfs = objClass.getInterfaces();
+        Class objClass;
+        Class[] itfs;
+
+        try {
+            objClass = Class.forName(ref.getInterfaceName());
+            itfs = new Class[]{objClass};
+        }catch (ClassNotFoundException e){
+            System.out.println("**************" + ref.getInterfaceName() + "**************");
+            e.printStackTrace();
+            objClass = Remote.class;
+            itfs = new Class[]{objClass};
+        }
 
         StubInvocationHandler handler = new StubInvocationHandler(ref);
         return (Remote) Proxy.newProxyInstance(objClass.getClassLoader(), itfs, handler);
