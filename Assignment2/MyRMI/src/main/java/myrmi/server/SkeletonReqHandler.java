@@ -1,6 +1,7 @@
 package myrmi.server;
 
 import myrmi.Remote;
+import myrmi.exception.RemoteException;
 import myrmi.protocal.InfoFromSkeleton;
 import myrmi.protocal.InfoFromStub;
 
@@ -9,6 +10,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.Socket;
 
@@ -43,7 +45,7 @@ public class SkeletonReqHandler extends Thread {
             //ois.close();
         }catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
-            invocationResult.setException(e.getMessage());
+            invocationResult.setException(e);
         }
 
         if (stub != null && stub instanceof InfoFromStub) {
@@ -68,16 +70,24 @@ public class SkeletonReqHandler extends Thread {
                         invocationResult.setStatus(2);
                     }
                 }else {
-                    invocationResult.setException("Wrong object key");
+                    invocationResult.setException(new Exception("wrong objectKey"));
                     invocationResult.setStatus(-1);
                 }
-            }catch (Exception e) {
+            }catch (InvocationTargetException e) {
                 e.printStackTrace();
-                invocationResult.setStatus(-1);
-                invocationResult.setException(e.getMessage());
+
+                invocationResult.setStatus(0);
+                if (e.getCause() instanceof Exception)
+                    invocationResult.setException((Exception) e.getCause());
+                else
+                    invocationResult.setException(e);
+            }catch (IllegalAccessException e){
+                e.printStackTrace();
+                invocationResult.setStatus(0);
+                invocationResult.setException(e);
             }
         }else {
-            invocationResult.setException("Stub is null or is not instance of the protocal.");
+            invocationResult.setException(new Exception("Stub is null or is not instance of the protocal."));
         }
 
         try {

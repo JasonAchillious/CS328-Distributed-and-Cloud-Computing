@@ -31,8 +31,7 @@ public class RegistryImpl implements Registry {
         if (bindings.containsKey(name)){
             return bindings.get(name);
         }else {
-            System.out.println("It has not such name of binding.");
-            return null;
+            throw new NotBoundException();
         }
     }
 
@@ -40,8 +39,11 @@ public class RegistryImpl implements Registry {
         System.out.printf("RegistryImpl: bind(%s)\n", name);
 
         //TODO: implement method here
-        this.bindings.put(name, obj);
-
+        if (bindings.containsKey(name)){
+            throw  new AlreadyBoundException();
+        }else {
+            this.bindings.put(name, obj);
+        }
     }
 
     public void unbind(String name) throws RemoteException, NotBoundException {
@@ -52,7 +54,7 @@ public class RegistryImpl implements Registry {
             bindings.remove(name);
             System.out.println("unbind successfully");
         }else {
-            System.out.printf("The registry has no such binding: %s\n", name);
+            throw new NotBoundException();
         }
 
     }
@@ -69,10 +71,11 @@ public class RegistryImpl implements Registry {
         String[] list = new String[bindings.size()];
         int i = 0;
         for (Map.Entry<String, Remote> entry : bindings.entrySet()) {
-            list[i] =  "Name: "
-                    + entry.getKey()
-                    + ", Class of the object: "
-                    + entry.getValue().getClass().getSimpleName();
+            list[i] =
+                   // "Name: " +
+                     entry.getKey();
+                   // + ", Class of the object: "
+                   // + entry.getValue().getClass().getSimpleName();
             i++;
         }
         return list;

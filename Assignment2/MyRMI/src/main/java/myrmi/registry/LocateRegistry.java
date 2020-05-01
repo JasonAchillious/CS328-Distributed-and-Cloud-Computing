@@ -6,14 +6,14 @@ import myrmi.exception.RemoteException;
 import java.lang.reflect.Proxy;
 
 public class LocateRegistry {
-    public static Registry getRegistry() throws RemoteException {
+    public static Registry getRegistry() {
         return getRegistry("127.0.0.1", Registry.REGISTRY_PORT);
     }
 
     /**
      * returns a stub of remote registry
      */
-    public static Registry getRegistry(String host, int port) throws RemoteException {
+    public static Registry getRegistry(String host, int port) {
         if (port <= 0) {
             port = Registry.REGISTRY_PORT;
         }

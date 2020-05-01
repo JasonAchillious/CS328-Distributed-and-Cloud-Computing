@@ -7,14 +7,14 @@ public class InfoFromSkeleton implements Serializable{
 
     private Object result;
     private int status;
-    private String exception=null;
+    private Exception exception=null;
     private int objectKey;
 
     public InfoFromSkeleton(int objectKey){
         this.objectKey = objectKey;
     }
 
-    public InfoFromSkeleton(Object result, int objectKey, String exception, int status){
+    public InfoFromSkeleton(Object result, int objectKey, Exception exception, int status){
         this.result = result;
         this.objectKey = objectKey;
         this.exception = exception;
@@ -37,11 +37,11 @@ public class InfoFromSkeleton implements Serializable{
         this.status = status;
     }
 
-    public String getException() {
+    public Exception getException() {
         return exception;
     }
 
-    public void setException(String exception) {
+    public void setException(Exception exception) {
         this.exception = exception;
     }
 

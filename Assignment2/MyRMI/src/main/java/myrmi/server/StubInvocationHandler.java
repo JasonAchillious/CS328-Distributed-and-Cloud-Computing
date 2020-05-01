@@ -37,9 +37,10 @@ public class StubInvocationHandler implements InvocationHandler, Serializable {
          * 1. connect to remote skeleton, send method and arguments
          * 2. get result back and return to caller transparently
          * */
-        InetAddress address = InetAddress.getByName(host);
+
         Object result = null;
-        Socket client = new Socket(address, this.port);
+
+        Socket client = new Socket(this.host, this.port);
         /*
         Serializable[] arguments;
         try {
@@ -66,7 +67,7 @@ public class StubInvocationHandler implements InvocationHandler, Serializable {
                 if (invokedResult.getStatus() == -1){
                     System.out.println("Invocation Error");
                 }
-                throw new Exception(invokedResult.getException());
+                throw invokedResult.getException();
             }else {
                 if (invokedResult.getStatus() == 2){
                     result = invokedResult.getResult();
@@ -75,7 +76,7 @@ public class StubInvocationHandler implements InvocationHandler, Serializable {
                 }
             }
         }
-        client.close();
+        //FileSystem.client.close();
         return result;
     }
 

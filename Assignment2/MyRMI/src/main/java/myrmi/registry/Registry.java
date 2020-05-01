@@ -8,7 +8,7 @@ import myrmi.exception.NotBoundException;
 import java.util.HashMap;
 
 public interface Registry extends Remote {
-    int REGISTRY_PORT = 11099;
+    int REGISTRY_PORT = 872;
     HashMap<String, Remote> bindings = new HashMap<>();
 
     public Remote lookup(String name) throws RemoteException, NotBoundException;

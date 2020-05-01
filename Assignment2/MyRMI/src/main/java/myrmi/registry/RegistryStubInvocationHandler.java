@@ -3,7 +3,8 @@ package myrmi.registry;
 import myrmi.exception.AlreadyBoundException;
 import myrmi.exception.NotBoundException;
 import myrmi.exception.RemoteException;
-import myrmi.server.*;
+import myrmi.server.RemoteObjectRef;
+import myrmi.server.Util;
 
 
 import java.lang.reflect.InvocationHandler;
@@ -15,11 +16,8 @@ public class RegistryStubInvocationHandler implements InvocationHandler {
     private RemoteObjectRef registryRef;
     private Registry registryStub;
 
-    public RegistryStubInvocationHandler(String host, int port) throws RemoteException {
-        this.registryRef = new RemoteObjectRef(host, port,
-                0,
-                "myrmi.registry.Registry"
-        );
+    public RegistryStubInvocationHandler(String host, int port) {
+        this.registryRef = new RemoteObjectRef(host, port, 0, "myrmi.registry.Registry");
         registryStub = (Registry) Util.createStub(this.registryRef);
     }
 
@@ -30,12 +28,12 @@ public class RegistryStubInvocationHandler implements InvocationHandler {
         try {
             result = method.invoke(this.registryStub, args);
             System.out.println("RegistryStub " + "Invoke " + method.getName());
+
         } catch (InvocationTargetException e) {
             throw e.getCause();
         }
         if ("lookup".equals(method.getName())) {
             //TODO: Here you need special handling for lookup, because it returns a stub
-            result = method.invoke(this.registryStub, args);
         }
         return result;
     }
