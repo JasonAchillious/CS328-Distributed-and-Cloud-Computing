@@ -32,7 +32,7 @@ proxies.
 invocation, but may require special processing when invoking certain methods.
 
 ## LiteMQ
-The project implements a simpliﬁed, Kafka-like distributed messaging system called LiteMQ. A list of functionalities you need to implement is as follows:
+The project implements a simpliﬁed, Kafka-like distributed messaging system called LiteMQ. A list of functionalities needed to implement are as follows:
 
  + Publish/Subscribe Pattern, that includes: creating new topics, publishing message on a speciﬁc topic, receiving message from a topic 
  
