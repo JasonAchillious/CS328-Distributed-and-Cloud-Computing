@@ -2,6 +2,7 @@ package client;
 
 import server.IFileServer;
 
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -11,15 +12,11 @@ import java.util.Date;
 public class Client implements IClient{
     private IFileServer stub;
 
-    public Client(String host, String binding){
-        try {
-            Registry reg = LocateRegistry.getRegistry(host);
-            stub = (IFileServer) reg.lookup(binding);
+    public Client(String host, String binding) throws RemoteException, NotBoundException {
 
-        } catch (Exception e) {
-            System.err.println("Client exception thrown: " + e.toString());
-            e.printStackTrace();
-        }
+        Registry reg = LocateRegistry.getRegistry(host);
+        stub = (IFileServer) reg.lookup(binding);
+
     }
 
     @Override

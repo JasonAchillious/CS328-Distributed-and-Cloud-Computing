@@ -6,12 +6,25 @@ import java.util.Scanner;
 
 public class ClientController {
     public static void main(String[] args){
-        String host = "localhost";
-        String ObjLookUp = "FileServer";
-
-        Client client = new Client(host, ObjLookUp);
-
         Scanner in = new Scanner(System.in);
+        String host;
+        String objLookUp;
+        Client client;
+        while(true) {
+            System.out.println("Please input the hostname of the file server: ");
+            host = in.next();
+            System.out.println("Please input the name for looking up the stub: ");
+            objLookUp = in.next();
+            try {
+                client = new Client(host, objLookUp);
+                break;
+            }catch (Exception e){
+                e.printStackTrace();
+                continue;
+            }
+        }
+
+
         String[] commandList = {"read", "create", "edit", "delete", "copy", "move", "printFileInfo"};
         Method[] methods = client.getClass().getMethods();
 
